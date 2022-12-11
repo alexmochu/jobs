@@ -1,8 +1,8 @@
 ## Jobs Scrapping API
 
 ### Tech stack
- Language: Python3.8
- Framework(micro): Flask 
+- Language: Python3.8
+- Framework(micro): Flask 
 
 ### Setup
 `cd jobs`
@@ -10,6 +10,7 @@
 - create virtual environment `python3 -m venv venv`
 - create an environment variable file `.env` and add the envrionment variables shared at the bottom of this README file
 - activate virtual environment `. venv/bin/activate` or `source .env`
+- run api on the development environment with the debuging flag `flask --debug run`
 
 #### Environment Variables(to be stored in the `.env` file)
 
