@@ -4,21 +4,17 @@
 from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
 
-# local imports
-from config import app_config
-
-
 
 def create_app(config_name):
     app = Flask(__name__, instance_relative_config=True)
-    # Reverse line 19 and 20 in production
-    # app.config.from_object(app_config[config_name])
     app.config.from_pyfile('config.py')
     CORS(app)
 
     from .home import home as home_blueprint
     app.register_blueprint(home_blueprint)
 
+    from .jobs import jobs as jobs_blueprint
+    app.register_blueprint(jobs_blueprint)
 
     @app.errorhandler(403)
     def forbidden(error):
