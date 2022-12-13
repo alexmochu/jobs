@@ -1,7 +1,9 @@
 # api/jobs/views.py
+from selenium import webdriver
+from bs4 import BeautifulSoup
 
 # universal imports
-from flask import Flask, jsonify, request, make_response
+from flask import jsonify
 
 # local imports
 from . import jobs
@@ -9,7 +11,32 @@ from . import jobs
 # search jobs route
 @jobs.route('/api/v1/search')
 def search_jobs():
+    options = webdriver.ChromeOptions()
+    options.add_argument('--ignore-certificate-errors')
+    options.add_argument('--incognito')
+    options.add_argument('--headless')
+    options.add_argument('--disable-extensions')
+    options.add_argument('start-maximized')
+    options.add_argument('disable-infobars')
+    driver = webdriver.Chrome(chrome_options=options, executable_path=r'C:\Web Driver\chromedriver.exe')
+
+    url = 'https://www.amazon.com/s?k='
+    search = 'smartphone'
+    # driver.get(url+search)
+
     response = jsonify({"message": "Search"})
+    URL = "https://www.google.com/search?q=site%3Alever.co+%7C+site%3Agreenhouse.io+%7C+site%3Ajobs.ashbyhq.com+%7C+site%3Aapp.dover.io+%28engineer+%7C+developer%29+%22react%22+-staff+-principal+-lead+-%22c%2B%2B%22+after%3A2022-11-01"
+    driver.get(URL)
+    content = driver.page_source
+    soup = BeautifulSoup(content, 'html.parser')
+
+    allRoles = soup.find_all('h3')
+    u = list()
+    for i in range(0, len(allRoles)):
+        u.append(allRoles[i].text.replace('\n', ''))
+        l ={}
+    print(u)
+    # print(soup.find_all('div', attrs = {'class': 'Z26q7c UK95Uc jGGQ5e'}))
     return response
 
 # @business.route('/api/v2/search', methods=['GET'])
