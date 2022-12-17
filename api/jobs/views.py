@@ -3,13 +3,13 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 
 # universal imports
-from flask import jsonify
+from flask import jsonify, request
 
 # local imports
 from . import jobs
 
 # search jobs route
-@jobs.route('/api/v1/search')
+@jobs.route('/api/v1/search', methods=['POST'])
 def search_jobs():
     options = webdriver.ChromeOptions()
     options.add_argument('--ignore-certificate-errors')
@@ -20,24 +20,46 @@ def search_jobs():
     options.add_argument('disable-infobars')
     driver = webdriver.Chrome(chrome_options=options, executable_path=r'C:\Web Driver\chromedriver.exe')
 
-    url = 'https://www.amazon.com/s?k='
-    search = 'smartphone'
-    # driver.get(url+search)
+    search = request.get_json()
+    ro = search['ro']
+    spe = search['spec']
+    fil = search['fil']
+    aft = search['afte']
 
-    response = jsonify({"message": "Search"})
-    URL = "https://www.google.com/search?q=site%3Alever.co+%7C+site%3Agreenhouse.io+%7C+site%3Ajobs.ashbyhq.com+%7C+site%3Aapp.dover.io+%28engineer+%7C+developer%29+%22react%22+-staff+-principal+-lead+-%22c%2B%2B%22+after%3A2022-11-01"
-    driver.get(URL)
+    url = 'https://www.google.com/search?q=site%3Alever.co+%7C+site%3Agreenhouse.io+%7C+site%3Ajobs.ashbyhq.com+%7C+site%3Aapp.dover.io'
+    role_name = '+%28engineer+%7C+developer%29'
+    speciality = '+%22react%22'
+    filter_out = '+-staff+-principal+-lead+-%22c%2B%2B%22'
+    before_date = "+before%3A2022-11-01"
+    after_date = "+after%3A2022-11-01"
+
+    driver.get(url + role_name + speciality + filter_out + after_date)
     content = driver.page_source
     soup = BeautifulSoup(content, 'html.parser')
 
-    allRoles = soup.find_all('h3')
+    allRoles = soup.find_all(['h3'])
+    jobDate = soup.find_all('span', attrs={'class': 'MUxGbd wuQ4Ob WZ8Tjf'})
+    div = soup.find_all("div", class_="yuRUbf")
+
+    links = []
+    for a in soup.find_all("div", class_="yuRUbf"):
+        link = a.find('a', href=True)
+        links.append(link['href'])
+    
+    summary = []
+    for s in soup.find_all('div', class_='VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf'):
+        all = s.find_all('span')
+        summary.append(all[2].text.replace('\n', ''))
+
     u = list()
     for i in range(0, len(allRoles)):
-        u.append(allRoles[i].text.replace('\n', ''))
-        l ={}
-    print(u)
-    # print(soup.find_all('div', attrs = {'class': 'Z26q7c UK95Uc jGGQ5e'}))
-    return response
+        u.append({
+            'role': allRoles[i].text.replace('\n', ''),
+            'url': links[i],
+            'job-date': jobDate[i].text.replace('\n', '')[:-3],
+            'summary': summary[i]
+            })
+    return u
 
 # @business.route('/api/v2/search', methods=['GET'])
 # def search(limit=6, page=1):
