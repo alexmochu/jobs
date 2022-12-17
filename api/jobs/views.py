@@ -21,6 +21,7 @@ def search_jobs():
     driver = webdriver.Chrome(chrome_options=options, executable_path=r'C:\Web Driver\chromedriver.exe')
 
     search = request.get_json()
+    print(search)
     ro = search['ro']
     spe = search['spec']
     fil = search['fil']
@@ -56,7 +57,7 @@ def search_jobs():
         u.append({
             'role': allRoles[i].text.replace('\n', ''),
             'url': links[i],
-            'job-date': jobDate[i].text.replace('\n', '')[:-3],
+            'job_date': jobDate[i].text.replace('\n', '')[:-3],
             'summary': summary[i]
             })
     return u
