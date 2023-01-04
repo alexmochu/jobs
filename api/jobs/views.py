@@ -21,19 +21,21 @@ def search_jobs():
     driver = webdriver.Chrome(chrome_options=options, executable_path=r'C:\Web Driver\chromedriver.exe')
 
     search = request.get_json()
-    print(search)
-    ro = search['ro']
-    spe = search['spec']
-    fil = search['fil']
-    aft = search['afte']
+    # print(search)
+    ro = search['roles']
+    spe = search['speciality']
+    fil = search['filter_out']
+    aft = search['after_date']
+    bef = search['before_date']
 
     url = 'https://www.google.com/search?q=site%3Alever.co+%7C+site%3Agreenhouse.io+%7C+site%3Ajobs.ashbyhq.com+%7C+site%3Aapp.dover.io'
     role_name = '+%28engineer+%7C+developer%29'
-    speciality = '+%22react%22'
+    speciality = '+%22' + spe + '%22'
     filter_out = '+-staff+-principal+-lead+-%22c%2B%2B%22'
-    before_date = "+before%3A2022-11-01"
-    after_date = "+after%3A2022-11-01"
+    before_date = "+before%3A" + bef
+    after_date = "+after%3A" + aft
 
+    # print(url + role_name + speciality + filter_out + after_date)
     driver.get(url + role_name + speciality + filter_out + after_date)
     content = driver.page_source
     soup = BeautifulSoup(content, 'html.parser')
@@ -53,9 +55,10 @@ def search_jobs():
         summary.append(all[2].text.replace('\n', ''))
 
     u = list()
-    for i in range(0, len(allRoles)):
+
+    for i in range(0, len(links)):
         u.append({
-            'role': allRoles[i].text.replace('\n', ''),
+            'role': allRoles[i+1].text.replace('\n', ''),
             'url': links[i],
             'job_date': jobDate[i].text.replace('\n', '')[:-3],
             'summary': summary[i]
