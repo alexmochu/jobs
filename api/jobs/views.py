@@ -1,5 +1,6 @@
 # api/jobs/views.py
 from selenium import webdriver
+
 from bs4 import BeautifulSoup
 
 # universal imports
@@ -35,12 +36,15 @@ def search_jobs():
     before_date = "+before%3A" + bef
     after_date = "+after%3A" + aft
 
+    PAGE_URL = url + role_name + speciality + filter_out + after_date
     # print(url + role_name + speciality + filter_out + after_date)
-    driver.get(url + role_name + speciality + filter_out + after_date)
+    driver.get(PAGE_URL)
     content = driver.page_source
+    # print(content)
     soup = BeautifulSoup(content, 'html.parser')
 
     allRoles = soup.find_all(['h3'])
+    # print(allRoles)
     jobDate = soup.find_all('span', attrs={'class': 'MUxGbd wuQ4Ob WZ8Tjf'})
     div = soup.find_all("div", class_="yuRUbf")
 
@@ -55,7 +59,7 @@ def search_jobs():
         summary.append(all[2].text.replace('\n', ''))
 
     u = list()
-
+    # print(links)
     for i in range(0, len(links)):
         u.append({
             'role': allRoles[i+1].text.replace('\n', ''),
@@ -63,6 +67,7 @@ def search_jobs():
             'job_date': jobDate[i].text.replace('\n', '')[:-3],
             'summary': summary[i]
             })
+    # print(u)
     return u
 
 # @business.route('/api/v2/search', methods=['GET'])

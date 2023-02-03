@@ -15,6 +15,8 @@ class DevelopmentConfig(Config):
     Development configurations
     """
 
+    SQLALCHEMY_DATABASE_URI =  'postgresql+psycopg2://dolf:wawu@localhost:5432/jobs'
+    SECRET_KEY = 'ofdhrjrbrneirgeojgoegekgneogre'
     DEBUG = True
     SQLALCHEMY_ECHO = True
 
