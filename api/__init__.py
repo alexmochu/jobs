@@ -19,10 +19,9 @@ from .auth.views import github_blueprint
 
 def create_app(config_name):
     app = Flask(__name__, instance_relative_config=True)
-    # print('my print',app_config, config_name)
     # Reverse line 19 and 20 in production
-    # app.config.from_object(app_config[config_name])
-    app.config.from_pyfile('config.py')
+    app.config.from_object(app_config[config_name])
+    # app.config.from_pyfile('config.py')
 
     app.secret_key = "supersecretkey"
 
