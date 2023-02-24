@@ -2,7 +2,7 @@
 
 import os
 # third-party imports
-from flask import Flask, jsonify, request, make_response, redirect, url_for
+from flask import Flask, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
@@ -18,11 +18,10 @@ from instance.config import app_config
 db = SQLAlchemy()
 
 from .models import login_manager
-from .auth.views import github_blueprint, google_blueprint, linkedin_blueprint
 
 def create_app(config_name):
     app = Flask(__name__, instance_relative_config=True)
-    # Reverse line 19 and 20 in production
+    # Reverse the following 2 lines in production
     app.config.from_object(app_config[config_name])
     # app.config.from_pyfile('config.py')
 
@@ -32,11 +31,6 @@ def create_app(config_name):
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     migrate = Migrate(app, db)
-    
-    # blueprint = make_github_blueprint()
-    app.register_blueprint(github_blueprint, url_prefix="/login")
-    app.register_blueprint(google_blueprint, url_prefix="/login")
-    app.register_blueprint(linkedin_blueprint, url_prefix="/login")
 
     CORS(app)
 
@@ -44,70 +38,11 @@ def create_app(config_name):
 
     with app.app_context():
         db.create_all()
-        
     
-    # def preferred_locale_value(multi_locale_string):
-    #     """
-    #     Extract the value of the preferred locale from a MultiLocaleString
-    #     https://docs.microsoft.com/en-us/linkedin/shared/references/v2/object-types#multilocalestring
-    #     """
-    #     preferred = multi_locale_string["locale"]
-    #     locale = "{language}_{country}".format(
-    #         language=preferred["language"], country=preferred["country"]
-    #     )
-    #     return multi_locale_string["localized"][locale]
-
-
-    @app.route("/github")
-    def github_login():
-        if not github.authorized:
-            return redirect(url_for("github.login"))
-        res = github.get("/user")
-        username = res.json()["login"]
-        return f"You are @{username} on GitHub"
-    
-    @app.route('/google')
-    def google_login():
-        if not google.authorized:
-            return redirect(url_for("google.login"))
-        resp = google.get("/oauth2/v2/userinfo")
-        assert resp.ok, resp.text
-        return "You are {email} on Google".format(email=resp.json()["email"])
-    
-    @app.route('/linkedin')
-    def linkedin_login():
-        if not linkedin.authorized:
-            return redirect(url_for("linkedin.login"))
-        resp = linkedin.get("userinfo")
-        print("user", resp)
-        assert resp.ok
-        data = resp.json()
-        print("user_data", data)
-        name = "{first} {last}".format(
-            first=data["given_name"],
-            last=data["family_name"]
-        )
-        return "You are {name} on LinkedIn".format(name=name)
-
-    
-    @app.route("/logout")
-    @login_required
-    def logout():
-        token = github_blueprint.token['access_token']
-        resp = github.post(
-            'https://api.github.com/applications/' + os.getenv('GITHUB_ID') + '/token',
-            params={"token": token},
-            headers={"Content-Type": "application/x-www-form-urlencoded"}
-        )
-        # assert resp.ok, resp.text
-        logout_user()
-        # del github_blueprint.token
-        return f"You logged out successfully"
-    
-    @app.route("/locked")
-    @login_required
-    def locked():
-        return f"Locked"
+    from .auth.views import github_blueprint, google_blueprint, linkedin_blueprint    
+    app.register_blueprint(github_blueprint, url_prefix="/login")
+    app.register_blueprint(google_blueprint, url_prefix="/login")
+    app.register_blueprint(linkedin_blueprint, url_prefix="/login")
 
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint)
