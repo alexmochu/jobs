@@ -95,9 +95,7 @@ def linkedin_logged_in(blueprint, token):
     info = linkedin.get("userinfo")
     if info.ok:
         account_info = info.json()
-        print("account", account_info)
         email = account_info["email"]
-        print("email", email)
         query = User.query.filter_by(email=email)
         try:
             user = query.one()
@@ -117,7 +115,6 @@ def github_login():
     
 @auth.route('/google')
 def google_login():
-    print('this is google', google)
     if not google.authorized:
         return redirect(url_for("google.login"))
     resp = google.get("/oauth2/v2/userinfo")
@@ -141,7 +138,6 @@ def google_login():
 @auth.route("/logout")
 @login_required
 def logout():
-    print("state", github)
     if google.authorized:
         token = google_blueprint.token['access_token']
         
