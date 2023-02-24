@@ -34,12 +34,11 @@ google_blueprint = make_google_blueprint(
     # backend=SQLAlchemyBackend(OAuth, db.session, user=current_user)
 )
 
-# linkedin_blueprint = make_linkedin_blueprint(
-#     client_id=os.getenv("LINKEDIN_CLIENT_ID"),
-#     client_secret=os.getenv("LINKEDIN_CLIENT_SECRET"),
-#     scope=["r_liteprofile"],
-#     # redirect_url="http://127.0.0.1:5000"
-# )
+linkedin_blueprint = make_linkedin_blueprint(
+    client_id=os.getenv("LINKEDIN_CLIENT_ID"),
+    client_secret=os.getenv("LINKEDIN_CLIENT_SECRET"),
+    scope=["openid", "profile", "email"],
+)
 
 @oauth_authorized.connect_via(github_blueprint)
 def github_logged_in(blueprint, token):

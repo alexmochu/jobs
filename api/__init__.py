@@ -18,8 +18,7 @@ from instance.config import app_config
 db = SQLAlchemy()
 
 from .models import login_manager
-from .auth.views import github_blueprint, google_blueprint
-# google_blueprint, linkedin_blueprint
+from .auth.views import github_blueprint, google_blueprint, linkedin_blueprint
 
 def create_app(config_name):
     app = Flask(__name__, instance_relative_config=True)
@@ -37,7 +36,7 @@ def create_app(config_name):
     # blueprint = make_github_blueprint()
     app.register_blueprint(github_blueprint, url_prefix="/login")
     app.register_blueprint(google_blueprint, url_prefix="/login")
-    # app.register_blueprint(linkedin_blueprint)
+    app.register_blueprint(linkedin_blueprint, url_prefix="/login")
 
     CORS(app)
 
@@ -47,16 +46,16 @@ def create_app(config_name):
         db.create_all()
         
     
-    def preferred_locale_value(multi_locale_string):
-        """
-        Extract the value of the preferred locale from a MultiLocaleString
-        https://docs.microsoft.com/en-us/linkedin/shared/references/v2/object-types#multilocalestring
-        """
-        preferred = multi_locale_string["preferredLocale"]
-        locale = "{language}_{country}".format(
-            language=preferred["language"], country=preferred["country"]
-        )
-        return multi_locale_string["localized"][locale]
+    # def preferred_locale_value(multi_locale_string):
+    #     """
+    #     Extract the value of the preferred locale from a MultiLocaleString
+    #     https://docs.microsoft.com/en-us/linkedin/shared/references/v2/object-types#multilocalestring
+    #     """
+    #     preferred = multi_locale_string["locale"]
+    #     locale = "{language}_{country}".format(
+    #         language=preferred["language"], country=preferred["country"]
+    #     )
+    #     return multi_locale_string["localized"][locale]
 
 
     @app.route("/github")
@@ -75,18 +74,20 @@ def create_app(config_name):
         assert resp.ok, resp.text
         return "You are {email} on Google".format(email=resp.json()["email"])
     
-    # @app.route('/linkedin')
-    # def linkedin_login():
-    #     if not linkedin.authorized:
-    #         return redirect(url_for("linkedin.login"))
-    #     resp = linkedin.get("me")
-    #     assert resp.ok, resp.text
-    #     data = resp.json()
-    #     name = "{first} {last}".format(
-    #         first=preferred_locale_value(data["firstName"]),
-    #         last=preferred_locale_value(data["lastName"]),
-    #     )
-    #     return "You are {name} on LinkedIn".format(name=name)
+    @app.route('/linkedin')
+    def linkedin_login():
+        if not linkedin.authorized:
+            return redirect(url_for("linkedin.login"))
+        resp = linkedin.get("userinfo")
+        print("user", resp)
+        assert resp.ok
+        data = resp.json()
+        print("user_data", data)
+        name = "{first} {last}".format(
+            first=data["given_name"],
+            last=data["family_name"]
+        )
+        return "You are {name} on LinkedIn".format(name=name)
 
     
     @app.route("/logout")
