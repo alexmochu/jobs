@@ -32,6 +32,12 @@ google_blueprint = make_google_blueprint(
            'https://www.googleapis.com/auth/userinfo.profile'],
     offline=True,
     reprompt_consent=True,
+    storage=SQLAlchemyStorage(
+        OAuth,
+        db.session,
+        user=current_user,
+        user_required=False,
+    ),
     # backend=SQLAlchemyBackend(OAuth, db.session, user=current_user)
 )
 
@@ -68,6 +74,39 @@ def github_logged_in(blueprint, token):
             db.session.commit()
         login_user(user)
         
+@oauth_authorized.connect_via(google_blueprint)
+def google_logged_in(blueprint, token):
+    info = google.get("/oauth2/v2/userinfo")
+    if info.ok:
+        account_info = info.json()
+        email = account_info["email"]
+
+        query = User.query.filter_by(email=email)
+        try:
+            user = query.one()
+        except NoResultFound:
+            user = User(email=email)
+            db.session.add(user)
+            db.session.commit()
+        login_user(user)
+        
+@oauth_authorized.connect_via(linkedin_blueprint)
+def linkedin_logged_in(blueprint, token):
+    info = linkedin.get("userinfo")
+    if info.ok:
+        account_info = info.json()
+        print("account", account_info)
+        email = account_info["email"]
+        print("email", email)
+        query = User.query.filter_by(email=email)
+        try:
+            user = query.one()
+        except NoResultFound:
+            user = User(email=email)
+            db.session.add(user)
+            db.session.commit()
+        login_user(user)
+ 
 @auth.route("/github")
 def github_login():
     if not github.authorized:
@@ -78,35 +117,47 @@ def github_login():
     
 @auth.route('/google')
 def google_login():
+    print('this is google', google)
     if not google.authorized:
         return redirect(url_for("google.login"))
     resp = google.get("/oauth2/v2/userinfo")
     assert resp.ok, resp.text
     return "You are {email} on Google".format(email=resp.json()["email"])
     
-@auth.route('/linkedin')
-def linkedin_login():
-    if not linkedin.authorized:
-        return redirect(url_for("linkedin.login"))
-    resp = linkedin.get("userinfo")
-    assert resp.ok
-    data = resp.json()
-    name = "{first} {last}".format(
-        first=data["given_name"],
-        last=data["family_name"]
-    )
-    return "You are {name} on LinkedIn".format(name=name)
+# @auth.route('/linkedin')
+# def linkedin_login():
+#     if not linkedin.authorized:
+#         return redirect(url_for("linkedin.login"))
+#     resp = linkedin.get("userinfo")
+#     assert resp.ok
+#     data = resp.json()
+#     name = "{first} {last}".format(
+#         first=data["given_name"],
+#         last=data["family_name"]
+#     )
+#     return "You are {name} on LinkedIn".format(name=name)
 
     
 @auth.route("/logout")
 @login_required
 def logout():
-    token = github_blueprint.token['access_token']
+    print("state", github)
+    if google.authorized:
+        token = google_blueprint.token['access_token']
+        
+        resp = google.post("https://accounts.google.com/o/oauth2/revoke?token="+token,
+            headers={"Content-Type": "application/x-www-form-urlencoded"}
+            )
+        logout_user()
+        return f"You logged out successfully"
+    
+    token = github_blueprint.token['access_token'] 
     resp = github.post(
         'https://api.github.com/applications/' + os.getenv('GITHUB_ID') + '/token',
         params={"token": token},
         headers={"Content-Type": "application/x-www-form-urlencoded"}
     )
+
     # assert resp.ok, resp.text
     logout_user()
     # del github_blueprint.token
