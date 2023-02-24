@@ -57,13 +57,13 @@ def github_logged_in(blueprint, token):
     info = github.get("/user")
     if info.ok:
         account_info = info.json()
-        username = account_info["login"]
+        email = account_info["email"]
 
-        query = User.query.filter_by(username=username)
+        query = User.query.filter_by(email=email)
         try:
             user = query.one()
         except NoResultFound:
-            user = User(username=username)
+            user = User(email=email)
             db.session.add(user)
             db.session.commit()
         login_user(user)
@@ -89,10 +89,8 @@ def linkedin_login():
     if not linkedin.authorized:
         return redirect(url_for("linkedin.login"))
     resp = linkedin.get("userinfo")
-    print("user", resp)
     assert resp.ok
     data = resp.json()
-    print("user_data", data)
     name = "{first} {last}".format(
         first=data["given_name"],
         last=data["family_name"]
