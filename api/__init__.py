@@ -14,6 +14,9 @@ from flask_dance.contrib.linkedin import make_linkedin_blueprint, linkedin
 # local imports
 from instance.config import app_config
 
+# production
+from config import app_config
+
 # db variable initialization
 db = SQLAlchemy()
 
