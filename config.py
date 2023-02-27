@@ -24,7 +24,8 @@ class ProductionConfig(Config):
     """
     Production configurations
     """
-
+    SQALALCHEMY_DATABASE_URI = 'postgresql://jobs_gh90_user:8yxF2DrGi4kdwhskMLJHvMDvZl5LVAkf@dpg-cfu6okh4reb6ks2vua80-a.frankfurt-postgres.render.com/jobs_gh90'
+    SECRET_KEY = 'ofdhrjrbrneirgeojgoegekgneogCVDSVSDVDSVre'    
     DEBUG = False
 
 class TestingConfig(Config):
