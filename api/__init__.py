@@ -26,7 +26,7 @@ def create_app(config_name):
     app = Flask(__name__, instance_relative_config=True)
     # Reverse the following 2 lines in production
     # app.config.from_object(app_config[config_name])
-    app.config.from_pyfile('config.py')
+    app.config.from_object(app_config[config_name])
 
     app.secret_key = "supersecretkey"
 
