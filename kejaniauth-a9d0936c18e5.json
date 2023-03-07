@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "kejaniauth",
+  "private_key_id": "a9d0936c18e56de28fc0a729d4dd83672126f9dd",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCvgw63WGPaNrXs\npa6PxW1WxTvxtulK4pN58aNPf9i1EwlAm26UxG+0y/93QjWAgbIPkWnTfsq+UTZo\nT6/W/r6VhQG0nrcX92/P7sbKQxOzmux5cVGX0e2bHQOB6cuWrrUXYlVLJaziQ0Pe\nb/KiF1zIBBq/9HtkcaHWQxJmN716ek0JId0EAhbdhP+AR4D6k7x/2WEzEsjGvn4K\n784UW+vALxhgZeL2QfrsX2Lc14EhUF8xIZPt6Rn2XSX7xsaOJf6ECTyNO4U+NIOK\nXRVdhrDXAl+qLuADK0lXEP7+rOMLEImzSpNV837FZN4GoOjrqs8Rq/Bl63uhlZqz\n3BLvX1rtAgMBAAECggEAPq4SWl4hwvOZAvuknMnII53qq4dER68lNf6a8TBaR0iW\nHFGmK1EAB9R21rN5gfxPiAnJfnOgmllMkfIrfR+bFrDajBPGlbOTZfIDYoaUCaeB\nXlme5xZcwfGZqBLD13trRv+iMGUzGdcl7NGUGFk5lGEK4JTCYHvIbUmkz4aGj693\nfISwSpqzAoQoX/8Zt7X96Ry1a4fe5N5PQJKIbXWsR5cOAB6WBOFsnUK8RqBT24mE\nWI4Nz7SuhBeKe+WeGBLr/fL2vNOjwT8mTeBtEQ1Ksg/NogPxKfj9CadFhiTCoBuJ\n/x+YxrMpvkrzt0I1q+LnAcaFZZidewYYKl1X2SUI7QKBgQDsIrvEijtaFTXG6t8P\nes5INv04bHSPRz44KXOWcrbhCrlavugUtfZBmDKt5kVgVxspL0Ny15OOR60hpUhv\nTtszfl19Bsx2So3eQay15ji7gJIBFuQp7EPRjmDYmWUx0BahsFbrr516OKs84fRE\nxwlLq4bJla0tjo1iBwu4lEmorwKBgQC+RsUojRTqEtwiY5pSsHVyuCgYR2s3gp26\nLFMA6NaEOaw8zZjoeZghVxHADNg2YfSMOr10NNs0GwmBBj3UXlVkHtQRhHX8k9Nd\nSnPxJxq6ccn8h9VpeItnb5AwDJfNs/f9tHdhXCgCJjrhupbSKx8oR4kIthR3iF3t\nnVebndQlIwKBgDjBgHAU6X8Vaf+NpF+MHNiunt5Y8wsdDI9jJy0aFWqxsStmh1Gz\nCqVpd4Tku/gT96tGeOe5ePXRtINJvsdCJN2TmdTbNXmZIdAx6NkvpKMsm+s3HVAW\nQZa0qgJlnDUE1uu1/q5XX3po9H+Fr7h4Pnu5loQNPbqdcM4G84JB4hJxAoGAVu6S\naUJ7ya2wMW38Ncc1AaKtftoyW/wq/8H8ci/uwh5vWKA+OghDvwe+rlWv+riqN98m\na48yjw3DO9WULhCjRsjm7tHr7efD6512dzj8dy5BsESG9lcCqdFIuQsn1+1fYeQv\nnqWyCblZsYPEIGVfKNH2A6rckvgUodj/C7QCFq0CgYBY7+QHvai9DsmDQK6dadb5\n3O/OYW/kdTkxfGcuzWXD3IZfh3CkHxJEAUk0UPlzvXgjgTpgc+9u5NcyYg4v4akY\nnDTsGZ/nc7KDTQ3fXKLXr54IYtrjg7DZ7wxRfhoQMw/1VVpK8vrzY51ewleNjAZC\nL3LdCJyegKSx8US2342Z/g==\n-----END PRIVATE KEY-----\n",
+  "client_email": "kejani-jobs-service-account@kejaniauth.iam.gserviceaccount.com",
+  "client_id": "112682293149275774918",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/kejani-jobs-service-account%40kejaniauth.iam.gserviceaccount.com"
+}

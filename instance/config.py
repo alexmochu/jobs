@@ -9,6 +9,8 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI =  os.getenv('DATABASE_URL')
     SECRET_KEY = 'ofdhrjrbrneirgeojgoegekgneogre'
     DEBUG = True
+    CACHE_TYPE= os.getenv('CACHE_TYPE')  # Flask-Caching related configs
+    CACHE_DEFAULT_TIMEOUT= os.getenv("CACHE_DEFAULT_TIMEOUT")
 
 class DevelopmentConfig(Config):
     """
@@ -17,6 +19,8 @@ class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
     DEBUG = True
     SQLALCHEMY_ECHO = True
+    CACHE_TYPE= os.getenv('CACHE_TYPE')  # Flask-Caching related configs
+    CACHE_DEFAULT_TIMEOUT= os.getenv("CACHE_DEFAULT_TIMEOUT")
 
 class ProductionConfig(Config):
     """
@@ -24,6 +28,8 @@ class ProductionConfig(Config):
     """
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
     DEBUG = False
+    CACHE_TYPE= os.getenv('CACHE_TYPE')  # Flask-Caching related configs
+    CACHE_DEFAULT_TIMEOUT= os.getenv("CACHE_DEFAULT_TIMEOUT")
 
 class TestingConfig(Config):
     """ Configurations for Testing, with a separate test database."""
