@@ -6,13 +6,15 @@ from flask import Flask, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
+from flask_caching import Cache
 from flask_login import login_required, logout_user
 from flask_dance.contrib.github import github, make_github_blueprint
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.contrib.linkedin import make_linkedin_blueprint, linkedin
+from flask_mail import Mail
 
 # local imports
-from instance.config import app_config
+# from instance.config import app_config
 
 # production
 from config import app_config
@@ -24,31 +26,42 @@ from .models import login_manager
 
 def create_app(config_name):
     app = Flask(__name__, instance_relative_config=True)
+    CORS(app, origins=['http://localhost:5173', 'https://jobs-api-km5w.onrender.com'])
+    mail = Mail(app)
+    cache = Cache(app, config={'CACHE_TYPE': 'simple'})
     # Reverse the following 2 lines in production
     # app.config.from_object(app_config[config_name])
     app.config.from_object(app_config[config_name])
 
-    app.secret_key = "supersecretkey"
+    app.secret_key = os.getenv("SECRET")
 
     db.init_app(app)
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+    app.config['MAIL_PORT'] = 465
+    app.config['MAIL_USE_SSL'] = True
+    app.config['MAIL_USERNAME'] = 'your-email@gmail.com'
+    app.config['MAIL_PASSWORD'] = 'your-email-password'
     migrate = Migrate(app, db)
-
-    CORS(app)
-
+    
     login_manager.init_app(app)
 
     with app.app_context():
         db.create_all()
-    
+   
+    # @app.after_request
+    # def after_request(response):
+    #     response.headers.add('Access-Control-Allow-Origin', '*')
+    #     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    #     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    #     response.headers.add('Access-Control-Allow-Credentials', 'true')
+    #     return response
+   
     from .auth.views import github_blueprint, google_blueprint, linkedin_blueprint    
     app.register_blueprint(github_blueprint, url_prefix="/login")
     app.register_blueprint(google_blueprint, url_prefix="/login")
     app.register_blueprint(linkedin_blueprint, url_prefix="/login")
-
-    from .auth import auth as auth_blueprint
-    app.register_blueprint(auth_blueprint)
 
     from .admin import admin as admin_blueprint
     app.register_blueprint(admin_blueprint)
@@ -58,6 +71,9 @@ def create_app(config_name):
 
     from .jobs import jobs as jobs_blueprint
     app.register_blueprint(jobs_blueprint)
+    
+    from .auth import auth as auth_blueprint
+    app.register_blueprint(auth_blueprint)
 
     @app.errorhandler(403)
     def forbidden(error):
@@ -70,7 +86,7 @@ def create_app(config_name):
         return make_response(jsonify(response)), 404
 
     @app.errorhandler(405)
-    def page_not_found(error):
+    def method_not_allowed(error):
         response = {"message" : "Request method is not allowed please recheck and try again"}
         return make_response(jsonify(response)), 405
 
