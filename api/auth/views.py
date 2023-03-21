@@ -302,7 +302,8 @@ def register():
 
 @auth.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
+    credentials = request.get_json()
+    data = credentials.get('credentials')
     username = data.get('username')
     password = data.get('password')
     
