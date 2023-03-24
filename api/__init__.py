@@ -26,7 +26,6 @@ from .models import login_manager
 
 def create_app(config_name):
     app = Flask(__name__, instance_relative_config=True)
-    CORS(app, origins=['http://localhost:5173', 'https://jobs-api-km5w.onrender.com'])
     mail = Mail(app)
     cache = Cache(app, config={'CACHE_TYPE': 'simple'})
     # Reverse the following 2 lines in production
@@ -49,14 +48,8 @@ def create_app(config_name):
 
     with app.app_context():
         db.create_all()
-   
-    # @app.after_request
-    # def after_request(response):
-    #     response.headers.add('Access-Control-Allow-Origin', '*')
-    #     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    #     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    #     response.headers.add('Access-Control-Allow-Credentials', 'true')
-    #     return response
+    CORS(app, resources={r'/*': {'origins': '*'}})    
+    app.config['CORS_HEADERS'] = 'Content-Type'
    
     from .auth.views import github_blueprint, google_blueprint, linkedin_blueprint    
     app.register_blueprint(github_blueprint, url_prefix="/login")

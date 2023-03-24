@@ -272,7 +272,8 @@ def google_signup():
 
 @auth.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()
+    userData = request.get_json()
+    data = userData.get('user')
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
@@ -300,7 +301,7 @@ def register():
     
     return jsonify({'message': 'Registration successful'}), 201
 
-@auth.route('/login', methods=['POST'])
+@auth.route('/api/login', methods=['POST'])
 def login():
     credentials = request.get_json()
     data = credentials.get('credentials')
@@ -323,9 +324,8 @@ def login():
         'header_access_token': header_access_token
         }), 200
 
-@auth.route('/logout', methods=['POST'])
+@auth.route('/api/logout', methods=['POST'])
 @token_required
-@cross_origin(supports_credentials=True)
 def logout(current_user_data, user_id):
     # logout_user()
     header_access_token = request.headers['header-access-token']
