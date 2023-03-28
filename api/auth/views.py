@@ -270,7 +270,7 @@ def google_signup():
 #     return jsonify({'message': "You logged out successfully"}), 200
 
 
-@auth.route('/register', methods=['POST'])
+@auth.route('/api/register', methods=['POST'])
 def register():
     userData = request.get_json()
     data = userData.get('user')
