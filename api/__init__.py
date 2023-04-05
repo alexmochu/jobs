@@ -40,7 +40,7 @@ def create_app(config_name):
     app.config['MAIL_SERVER'] = 'smtp.gmail.com'
     app.config['MAIL_PORT'] = 465
     app.config['MAIL_USE_SSL'] = True
-    app.config['MAIL_USERNAME'] = 'your-email@gmail.com'
+    app.config['MAIL_USERNAME'] = os.getenv('MAIL_DEFAULT_SENDER')
     app.config['MAIL_PASSWORD'] = 'your-email-password'
     migrate = Migrate(app, db)
     
@@ -64,6 +64,9 @@ def create_app(config_name):
 
     from .jobs import jobs as jobs_blueprint
     app.register_blueprint(jobs_blueprint)
+    
+    from .gpt import gpt as gpt_blueprint
+    app.register_blueprint(gpt_blueprint)
     
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint)
