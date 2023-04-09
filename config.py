@@ -6,30 +6,42 @@ class Config(object):
     Common configurations
     """
     # Put any configurations here that are common across all environments
-    SECRET_KEY = 'ofdhrjrbrneirgeojgoegekgneogre'
+    # SQLALCHEMY_DATABASE_URI =  'postgresql+psycopg2://dolf:wawu@localhost:5432/jobs'
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    SECRET_KEY = os.getenv("SECRET")
     DEBUG = True
+    CACHE_TYPE= os.getenv('CACHE_TYPE')  # Flask-Caching related configs
+    CACHE_DEFAULT_TIMEOUT= os.getenv("CACHE_DEFAULT_TIMEOUT")
 
 class DevelopmentConfig(Config):
     """
     Development configurations
     """
 
+    SQLALCHEMY_DATABASE_URI =  os.getenv('DATABASE_URL')
+    SECRET_KEY = os.getenv("SECRET")
     DEBUG = True
     SQLALCHEMY_ECHO = True
+    CACHE_TYPE= os.getenv('CACHE_TYPE')  # Flask-Caching related configs
+    CACHE_DEFAULT_TIMEOUT= os.getenv("CACHE_DEFAULT_TIMEOUT")
 
 class ProductionConfig(Config):
     """
     Production configurations
     """
-
+    SQALALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    SECRET_KEY = os.getenv("SECRET")    
     DEBUG = False
+    CACHE_TYPE= os.getenv('CACHE_TYPE')  # Flask-Caching related configs
+    CACHE_DEFAULT_TIMEOUT= os.getenv("CACHE_DEFAULT_TIMEOUT")
 
 class TestingConfig(Config):
     """ Configurations for Testing, with a separate test database."""
     TESTING = True
     DEBUG = True
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
     PRESERVE_CONTEXT_ON_EXCEPTION = False
-    SECRET_KEY = 'ofdhrjrbrneirgeojgoegekgneogre'
+    SECRET_KEY = os.getenv("SECRET")
 
 app_config = {
     'development': DevelopmentConfig,
