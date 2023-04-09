@@ -8,7 +8,7 @@ from . import gpt
 from ..utilities import token_required
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
-  
+
 @gpt.route('/kejani-ai/question', methods=['GET', 'POST'])
 @token_required
 def question_gpt(current_user_data, user_id):
@@ -21,7 +21,8 @@ def question_gpt(current_user_data, user_id):
         resume = request.form["resume"]
         response = openai.Completion.create(
             model="text-davinci-003",
-            prompt=question_answer_propmt(question, job, purpose, position, accountabilities, resume),
+            prompt=question_answer_propmt(
+                question, job, purpose, position, accountabilities, resume),
             temperature=0.6,
         )
         return redirect(url_for("index", result=response.choices[0].text))
