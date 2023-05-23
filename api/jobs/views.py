@@ -1,3 +1,13 @@
+import os
+from langchain.agents import initialize_agent
+from langchain.agents import load_tools
+from langchain.llms import OpenAI
+
+os.environ["GOOGLE_CSE_ID"] = ""
+os.environ["GOOGLE_API_KEY"] = "AIzaSyAPMkDsSq80BMrOwrreedFzr6lTeGQO-UY"
+os.environ["SERPAPI_API_KEY"] = "adcce69ae1aadbc78fe655089b91e21a65f5fbcda3e98d3e04f00f4b8c42770a"
+os.environ["OPENAI_API_KEY"] = "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"
+
 # api/jobs/views.py
 from selenium import webdriver
 
@@ -103,3 +113,12 @@ def search_jobs():
 #         return jsonify({'Businesses': business_list}), 200
 #     else:
 #         return jsonify({'Warning': 'Cannot comprehend the given search parameter'})
+
+
+@jobs.route('/api/v1/openai', methods=['GET'])
+def openai_jobs():
+    llm = OpenAI(temperature=0)
+    tool_names = ["serpapi"]
+    tools = load_tools(tool_names)
+    agent = initialize_agent(tools, llm, agent="zero-shot-react-description", verbose=True)
+    return agent.run("10 recent remote react jobs that accept worldwide applicants in json format")
