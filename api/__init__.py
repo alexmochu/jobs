@@ -6,11 +6,7 @@ from flask import Flask, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
-from flask_caching import Cache
 from flask_login import login_required, logout_user
-from flask_dance.contrib.github import github, make_github_blueprint
-from flask_dance.contrib.google import make_google_blueprint, google
-from flask_dance.contrib.linkedin import make_linkedin_blueprint, linkedin
 from flask_mail import Mail
 
 # local imports
@@ -27,7 +23,6 @@ from .models import login_manager
 def create_app(config_name):
     app = Flask(__name__, instance_relative_config=True)
     mail = Mail(app)
-    cache = Cache(app, config={'CACHE_TYPE': 'simple'})
     # Reverse the following 2 lines in production
     # app.config.from_object(app_config[config_name])
     app.config.from_object(app_config[config_name])
@@ -51,11 +46,6 @@ def create_app(config_name):
     CORS(app, resources={r'/*': {'origins': '*'}})    
     app.config['CORS_HEADERS'] = 'Content-Type'
    
-    from .auth.views import github_blueprint, google_blueprint, linkedin_blueprint    
-    app.register_blueprint(github_blueprint, url_prefix="/login")
-    app.register_blueprint(google_blueprint, url_prefix="/login")
-    app.register_blueprint(linkedin_blueprint, url_prefix="/login")
-
     from .admin import admin as admin_blueprint
     app.register_blueprint(admin_blueprint)
     
