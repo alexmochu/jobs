@@ -1,16 +1,10 @@
-import os
-import jwt
-import datetime
 
-from flask import Flask, jsonify, request, make_response, redirect, url_for, current_app
-from flask_login import current_user, login_user
-from flask_login import login_required, logout_user
-from flask_cors import cross_origin
-from functools import wraps
+from flask import jsonify, request, make_response
+from flask_login import login_user
 
 from . import auth
 from .. import db
-from ..models import OAuth, User, BlacklistToken
+from ..models import User, BlacklistToken
 from ..utilities import token_required
 
 @auth.route('/api/register', methods=['POST'])
