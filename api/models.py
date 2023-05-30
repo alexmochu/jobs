@@ -2,7 +2,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, LoginManager
-from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
 from flask import current_app
 import jwt
 from time import time
@@ -82,11 +81,6 @@ class BlacklistToken(db.Model):
 
     def __repr__(self):
         return '<id: token: {}'.format(self.token)
-    
-class OAuth(OAuthConsumerMixin, db.Model):
-    __tablename__='oauth'
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
-    user = db.relationship(User)
 
 login_manager = LoginManager()
 
