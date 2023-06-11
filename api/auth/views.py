@@ -40,26 +40,38 @@ def register():
 
 @auth.route('/api/login', methods=['POST'])
 def login():
-    credentials = request.get_json()
-    data = credentials.get('credentials')
-    username = data.get('username')
-    password = data.get('password')
-    
-    if username is None or password is None:
-        return jsonify({'error': 'Missing fields'}), 400
-    
-    user = User.query.filter_by(username=username).first()
-    
-    if user is None or not user.check_password(password):
-        return jsonify({'error': 'Invalid credentials'}), 401
-    
-    login_user(user)
-    header_access_token = user.get_token()
-    # jwt.encode({'username': user.username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, current_app.config.get('SECRET_KEY'))    
-    return jsonify({
-        'message': 'Login successful',
-        'header_access_token': header_access_token
-        }), 200
+    try:
+        credentials = request.get_json()
+        data = credentials.get('credentials')
+        username = data.get('username')
+        password = data.get('password')
+        
+        if username is None or password is None:
+            return jsonify({'error': 'Missing fields'}), 400
+        
+        user = User.query.filter_by(username=username).first()
+        
+        if user is None or not user.check_password(password):
+            return jsonify({'error': 'Invalid credentials'}), 401
+        
+        if user and user.check_password(password):
+            login_user(user)
+            header_access_token = user.get_token()
+            # jwt.encode({'username': user.username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, current_app.config.get('SECRET_KEY'))    
+            return jsonify({
+                'message': 'You logged in successfully.',
+                'header_access_token': header_access_token
+                }), 200
+        else:
+            # User does not exist. Therefore, we return an error message
+            response = {'error': 'Invalid username or password, Please try again'}
+            return make_response(jsonify(response)), 401
+
+    except Exception as e:
+        # Create a response containing an string error message
+        response = {'error': str(e)}
+        # Return a server error using the HTTP Error Code 500 (Internal Server Error)
+        return make_response(jsonify(response)), 500
 
 @auth.route('/api/logout', methods=['POST'])
 @token_required
