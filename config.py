@@ -7,7 +7,7 @@ class Config(object):
     """
     # Put any configurations here that are common across all environments
     # SQLALCHEMY_DATABASE_URI =  'postgresql+psycopg2://dolf:wawu@localhost:5432/jobs'
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    # SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
     SECRET_KEY = os.getenv("SECRET")
     DEBUG = True
     CACHE_TYPE= os.getenv('CACHE_TYPE')  # Flask-Caching related configs
@@ -18,7 +18,7 @@ class DevelopmentConfig(Config):
     Development configurations
     """
 
-    SQLALCHEMY_DATABASE_URI =  os.getenv('DATABASE_URL')
+    SQLALCHEMY_DATABASE_URI =  os.getenv('LOCAL_DATABASE_URL')
     SECRET_KEY = os.getenv("SECRET")
     DEBUG = True
     SQLALCHEMY_ECHO = True
@@ -39,7 +39,7 @@ class TestingConfig(Config):
     """ Configurations for Testing, with a separate test database."""
     TESTING = True
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    # SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
     PRESERVE_CONTEXT_ON_EXCEPTION = False
     SECRET_KEY = os.getenv("SECRET")
 
