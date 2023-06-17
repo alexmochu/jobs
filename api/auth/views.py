@@ -1,4 +1,4 @@
-
+import os
 from flask import jsonify, request, make_response
 from flask_login import login_user
 
@@ -6,6 +6,12 @@ from . import auth
 from .. import db
 from ..models import User, BlacklistToken
 from ..utilities import token_required
+import resend
+
+
+import resend
+
+resend.api_key = os.getenv('RESEND')
 
 @auth.route('/api/register', methods=['POST'])
 def register():
@@ -29,8 +35,14 @@ def register():
     
     db.session.add(user)
     db.session.commit()
-    
-    
+
+    r = resend.Emails.send({
+    "from": "onboarding@resend.dev",
+    "to": "mochualex4@gmail.com",
+    "subject": "Welcome to KG(Kejani Garage) Jobs",
+    "html": "<p>Congrats on sending your <strong>first email</strong>!</p>"
+    })
+     
     # Send email verification email
     # msg = Message('Email Verification', recipients=[new_user.email])
     # msg.body = f'To verify your email, click on the following link: {request.host_url}auth/verify_email/{token}'
