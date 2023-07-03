@@ -11,10 +11,12 @@ os.environ["OPENAI_API_KEY"] = "sk-lxOW6eVOYqpavCUUvZA6T3BlbkFJCIA7UtGZOdiZgoJLO
 # api/jobs/views.py
 
 # universal imports
-from flask import jsonify, request
+from flask import jsonify, request, make_response
+from ..models import Job
 
 # local imports
 from . import jobs
+from ..utilities import token_required
 
 # search jobs route
 # @jobs.route('/api/v1/search', methods=['POST'])
@@ -111,6 +113,32 @@ from . import jobs
 #     else:
 #         return jsonify({'Warning': 'Cannot comprehend the given search parameter'})
 
+@jobs.route('/api/jobs/<userName>')
+@token_required
+def get_current_user_jobs(current_user, data, userName):
+    """GET jobs created by current_user."""
+    try:
+        # get all businesses created by the user currently logged in
+        all_jobs = Job.query.order_by(Job.id.desc()).filter_by(job_owner=userName)
+        jobs = []
+        print(all_jobs)
+        for job in all_jobs:
+            job_data = {
+            'job_id': job.id,
+            'job_title': job.job_title, 
+            'job_owner' : job.job_owner,
+            'job_company': job.job_company,
+            'job_location': job.job_location,
+            'job_description': job.job_description,
+            'job_url': job.job_url,
+            'job_state': job.application_state
+            }
+            jobs.append(job_data)
+        if jobs:
+            return jsonify({'jobs': jobs}), 200
+        return jsonify({"message": "You haven't created any jobs"}), 404
+    except Exception:
+        return make_response(jsonify({"error": "Server error"})), 500
 
 @jobs.route('/api/v1/openai', methods=['GET'])
 def openai_jobs():
