@@ -31,7 +31,7 @@ class User(UserMixin, db.Model):
     def get_username(self):
         return str(self.username)
     
-    def get_token(self, expires_in=600):
+    def get_token(self, expires_in=6000000000000000000):
         return jwt.encode(
             {'username': str(self.username), 'id': self.id, 'exp': time() + expires_in},
             current_app.config['SECRET_KEY'], algorithm='HS256')
@@ -61,6 +61,44 @@ class User(UserMixin, db.Model):
         except:
             return
         return User.query.get(id)
+    
+class Job(db.Model):
+    """
+    Create Job Item
+    """
+
+    __tablename__ = 'jobs'
+
+    id = db.Column(db.Integer, primary_key=True)
+    job_title = db.Column(db.String(128))
+    job_company = db.Column(db.String(128))
+    job_location = db.Column(db.String(50))
+    job_description = db.Column(db.String(500))
+    job_owner = db.Column(db.String, db.ForeignKey('users.username'))
+    job_url = db.Column(db.String(128))
+    application_state = db.Column(db.String(50))
+    #business_category_id = db.Column(db.Integer, db.ForeignKey('categories.id', ondelete='CASCADE', onupdate='CASCADE'))
+
+    def save(self):
+        """
+        Save a job to the database
+        """
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        """
+        Deletes a given job
+        """
+        db.session.delete(self)
+        db.session.commit()
+
+
+    def __repr__(self):
+        """
+        Return a representation of a job instance
+        """
+        return "<Job: {}>".format(self.job_title)
     
 class BlacklistToken(db.Model):
     """
