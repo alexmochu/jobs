@@ -146,7 +146,8 @@ def get_current_user_jobs(current_user, data, userName):
             'job_location': job.job_location,
             'job_description': job.job_description,
             'job_url': job.job_url,
-            'job_state': job.application_state
+            'job_state': job.application_state,
+            'job_type': job.job_type
             }
             jobs.append(job_data)
         if jobs:
@@ -170,13 +171,13 @@ def get_current_user_jobs(current_user, data, userName):
 def create_job(current_user, data):   
     """ Method to create review."""
     job_item = request.get_json()
-    job_title = job_item['jobTitle']
-    job_company = job_item['jobCompany']
-    job_location = job_item['jobLocation'],
-    job_description = job_item['jobDescription'],
-    job_type = job_item['jobType'],
-    job_url = job_item['jobUrl'],
-    application_state = job_item['applicationState']
+    job_title = job_item['job']['jobTitle']
+    job_company = job_item['job']['jobCompany']
+    job_location = job_item['job']['jobLocation'],
+    job_description = job_item['job']['jobDescription'],
+    job_type = job_item['job']['jobType'],
+    job_url = job_item['job']['jobUrl'],
+    application_state = job_item['job']['applicationState']
     try:
         created_job = Job(
             job_title=job_title, 
@@ -202,13 +203,13 @@ def update_business(current_user, data, job_id):
     if data['username'] == owner:
     # Obtain the new name of the business from the request data
         job_item = request.get_json()
-        job_title = job_item['jobTitle']
-        job_company = job_item['jobCompany']
-        job_location = job_item['jobLocation'],
-        job_description = job_item['jobDescription'],
-        job_type = job_item['jobType'],
-        job_url = job_item['jobUrl'],
-        application_state = job_item['applicationState']
+        job_title = job_item['job']['job_title']
+        job_company = job_item['job']['job_company']
+        job_location = job_item['job']['job_location'],
+        job_description = job_item['job']['job_description'],
+        job_type = job_item['job']['job_type'],
+        job_url = job_item['job']['job_url'],
+        application_state = job_item['job']['job_state']
         try:
             current_job.job_title = job_title
             current_job.job_company = job_company
