@@ -189,7 +189,19 @@ def create_job(current_user, data):
             job_type = job_type,
             application_state = application_state) 
         created_job.save()
-        response = jsonify({'message': 'Job created successfully.'})
+        response = jsonify({
+            'message': 'Job created successfully.',
+            'job': {
+                'job_id': created_job.id,
+                'job_title': created_job.job_title,
+                'job_company': created_job.job_company,
+                'job_location': created_job.job_location,
+                'job_description': created_job.job_description,
+                'job_type': created_job.job_type,
+                'job_url': created_job.job_url,
+                'application_state': created_job.application_state
+            }
+            })
     except KeyError:
         response = {"error": "There was an error creating the job, please try again"}
         return make_response(jsonify(response)), 500                            
@@ -219,7 +231,19 @@ def update_business(current_user, data, job_id):
             current_job.job_url = job_url
             current_job.application_state = application_state
             current_job.save()
-            response = {'message': 'Job updated successfully.'}
+            response = {
+                'message': 'Job updated successfully.',
+                'job': {
+                    'job_id': current_job.id,
+                    'job_title': current_job.job_title,
+                    'job_company': current_job.job_company,
+                    'job_location': current_job.job_location,
+                    'job_description': current_job.job_description,
+                    'job_type': current_job.job_type,
+                    'job_url': current_job.job_url,
+                    'application_state': current_job.application_state
+                    }
+                        }
             return make_response(jsonify(response)), 200
         except KeyError:
             response = {"error": "There was an error updating the Job, please try again"}
@@ -236,7 +260,19 @@ def delete_business_by_id(current_user, data, job_id):
     owner = job.job_owner
     if data['username'] == owner:
         job.delete()
-        response = {"result": "Job {} deleted".format(job.id)}
+        response = {
+            "result": "Job {} deleted".format(job.id),
+            "job": {
+                'job_id': job.id,
+                'job_title': job.job_title,
+                'job_company': job.job_company,
+                'job_location': job.job_location,
+                'job_description': job.job_description,
+                'job_type': job.job_type,
+                'job_url': job.job_url,
+                'application_state': job.application_state                
+            }
+            }
         return jsonify(response), 200
     response = {"error": "You can only delete your own job"}
     return jsonify(response), 401                   
