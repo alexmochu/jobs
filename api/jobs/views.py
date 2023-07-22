@@ -174,14 +174,13 @@ def create_job(current_user, data):
     job_company = job_item['jobCompany']
     job_location = job_item['jobLocation'],
     job_description = job_item['jobDescription'],
-    job_owner = job_item['jobOwner'],
     job_type = job_item['jobType'],
     job_url = job_item['jobUrl'],
     application_state = job_item['applicationState']
     try:
         created_job = Job(
             job_title=job_title, 
-            job_owner = job_owner, 
+            job_owner = data['username'], 
             job_company=job_company, 
             job_location = job_location, 
             job_description = job_description,
@@ -199,7 +198,6 @@ def create_job(current_user, data):
 @token_required
 def update_business(current_user, data, job_id):
     current_job = Job.query.filter_by(id=job_id).first()
-    print('this is data', data)
     owner = current_job.job_owner
     if data['username'] == owner:
     # Obtain the new name of the business from the request data
