@@ -1,12 +1,27 @@
 import os
+import asyncio
 from langchain.agents import initialize_agent
-from langchain.agents import load_tools
+from langchain.agents import load_tools,initialize_agent, AgentType
 from langchain.llms import OpenAI
+from langchain.output_parsers import StructuredOutputParser, ResponseSchema
+from langchain.prompts import PromptTemplate
+from langchain.agents.agent_toolkits import PlayWrightBrowserToolkit
+# from langchain.tools.playwright.utils import (
+#     create_async_playwright_browser,
+# )
+from langchain.agents import AgentType
+from langchain.chat_models import ChatOpenAI
+from playwright.async_api import async_playwright
+import re
+from playwright.sync_api import Page, expect
+from langchain.chat_models import ChatAnthropic
 
 os.environ["GOOGLE_CSE_ID"] = ""
 os.environ["GOOGLE_API_KEY"] = "AIzaSyAPMkDsSq80BMrOwrreedFzr6lTeGQO-UY"
 os.environ["SERPAPI_API_KEY"] = "adcce69ae1aadbc78fe655089b91e21a65f5fbcda3e98d3e04f00f4b8c42770a"
-os.environ["OPENAI_API_KEY"] = "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"
+os.environ["OPENAI_API_KEY"] = "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"
+
+# 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
 
 # api/jobs/views.py
 
@@ -140,10 +155,160 @@ def get_current_user_jobs(current_user, data, userName):
     except Exception:
         return make_response(jsonify({"error": "Server error"})), 500
 
+
+    # id = db.Column(db.Integer, primary_key=True)
+    # job_title = db.Column(db.String(128))
+    # job_company = db.Column(db.String(128))
+    # job_location = db.Column(db.String(50))
+    # job_description = db.Column(db.String(500))
+    # job_owner = db.Column(db.String, db.ForeignKey('users.username'))
+    # job_url = db.Column(db.String(128))
+    # application_state = db.Column(db.String(50))
+
+@jobs.route('/api/jobs', methods=['POST'])
+@token_required
+def create_job(current_user, data):   
+    """ Method to create review."""
+    job_item = request.get_json()
+    job_title = job_item['jobTitle']
+    job_company = job_item['jobCompany']
+    job_location = job_item['jobLocation'],
+    job_description = job_item['jobDescription'],
+    job_owner = job_item['jobOwner'],
+    job_type = job_item['jobType'],
+    job_url = job_item['jobUrl'],
+    application_state = job_item['applicationState']
+    try:
+        created_job = Job(
+            job_title=job_title, 
+            job_owner = job_owner, 
+            job_company=job_company, 
+            job_location = job_location, 
+            job_description = job_description,
+            job_url = job_url,
+            job_type = job_type,
+            application_state = application_state) 
+        created_job.save()
+        response = jsonify({'message': 'Job created successfully.'})
+    except KeyError:
+        response = {"error": "There was an error creating the job, please try again"}
+        return make_response(jsonify(response)), 500                            
+    return make_response(response), 201 
+
+@jobs.route('/api/job/<job_id>', methods=['PUT'])
+@token_required
+def update_business(current_user, data, job_id):
+    current_job = Job.query.filter_by(id=job_id).first()
+    print('this is data', data)
+    owner = current_job.job_owner
+    if data['username'] == owner:
+    # Obtain the new name of the business from the request data
+        job_item = request.get_json()
+        job_title = job_item['jobTitle']
+        job_company = job_item['jobCompany']
+        job_location = job_item['jobLocation'],
+        job_description = job_item['jobDescription'],
+        job_type = job_item['jobType'],
+        job_url = job_item['jobUrl'],
+        application_state = job_item['applicationState']
+        try:
+            current_job.job_title = job_title
+            current_job.job_company = job_company
+            current_job.job_location = job_location
+            current_job.job_description = job_description
+            current_job.job_type = job_type
+            current_job.job_url = job_url
+            current_job.application_state = application_state
+            current_job.save()
+            response = {'message': 'Job updated successfully.'}
+            return make_response(jsonify(response)), 200
+        except KeyError:
+            response = {"error": "There was an error updating the Job, please try again"}
+            return make_response(jsonify(response)), 500
+    response = {"error": "You can only update your own job"}
+    return jsonify(response), 401  
+
+@jobs.route('/api/job/<job_id>', methods=['DELETE'])
+@token_required
+def delete_business_by_id(current_user, data, job_id):
+    """ Method to get job by ID """
+    job = Job.query.filter_by(id=job_id).first()
+    print('job id', job_id)
+    owner = job.job_owner
+    if data['username'] == owner:
+        job.delete()
+        response = {"result": "Job {} deleted".format(job.id)}
+        return jsonify(response), 200
+    response = {"error": "You can only delete your own job"}
+    return jsonify(response), 401                   
+
+
+response_schemas = [
+    ResponseSchema(name="job_title", description="job title from the users question"),
+    ResponseSchema(name="job_company", description="job company name from the users question"),
+    ResponseSchema(name="job_company", description="job link from the users question")
+]
+
+output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
+
+format_instructions = output_parser.get_format_instructions()
+# prompt = PromptTemplate(
+#     template="{question}"
+    # answer the users question as best as possible.\n{format_instructions}\n{question}",
+    # input_variables=["question"],
+    # partial_variables={"format_instructions": format_instructions}
+# )
+
+# _input = prompt.format_prompt(question="results of 10 recent remote react jobs that accept worldwide applicants in 2023")
+                            #   . List this jobs. The list should in json format containg the company name, job title and the url of the job description. Return this list as following")
+
+
 @jobs.route('/api/v1/openai', methods=['GET'])
 def openai_jobs():
-    llm = OpenAI(temperature=0)
+    llm = OpenAI(temperature=0, model='text-davinci-003')
     tool_names = ["serpapi"]
     tools = load_tools(tool_names)
     agent = initialize_agent(tools, llm, agent="zero-shot-react-description", verbose=True)
-    return agent.run("10 recent remote react jobs that accept worldwide applicants in json format")
+    # Browse to blog.langchain.dev and summarize the text
+    # return agent.run("Explore google and find 10 recent remote react jobs that accept worldwide applicants. List this jobs. The list should in json format containg the company name, job title and the url of the job description. Return this list as following {job_title: the job title, job_company: company name of the job, job_url: url of the job}")
+    # return agent.run("what is langchain")
+    return agent.run("search results of job url links of 10 recent remote react jobs that accept worldwide applicants in 2023")
+
+async def create_async_playwright_browser(loop):
+    async with async_playwright() as playwright:
+        browser = await playwright.chromium.launch()
+        context = await browser.new_context()
+        page = await context.new_page()
+
+        # Perform browser actions here
+
+        await browser.close()
+
+@jobs.route('/api/job_summary', methods=['GET'])
+async def job_summary():
+    loop = asyncio.get_running_loop()
+    # async_browser = await create_async_playwright_browser(loop)
+    # # async_browser = await create_async_playwright_browser(loop)
+    # browser_toolkit = PlayWrightBrowserToolkit(async_browser=async_browser, sync_browser=None)
+    # tools = browser_toolkit.get_tools()
+    # llm = ChatOpenAI(temperature=0) # Also works well with Anthropic models
+    # agent_chain = initialize_agent(tools, llm, agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
+    # response = agent_chain.arun(input="Browse to https://jobs.kejanigarage.com/ and summarize the text, please.")
+    # return make_response(jsonify({
+    #     'summary': response
+    # }))
+    async_browser = create_async_playwright_browser(loop)
+    toolkit = PlayWrightBrowserToolkit(sync_browser=None, async_browser=None)
+    tools = toolkit.get_tools()
+    llm = ChatAnthropic(temperature=0)  # or any other LLM, e.g., ChatOpenAI(), OpenAI()
+
+    agent_chain = initialize_agent(
+        tools,
+        llm,
+        agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
+        verbose=True,
+    )
+
+    result = await agent_chain.arun("What are the headers on langchain.com?")
+    print(result)
+
