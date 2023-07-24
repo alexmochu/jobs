@@ -94,8 +94,39 @@ def logout(current_user_data, user_id):
             'message': e
         }
         return make_response(jsonify(response)), 200 
+    
+@auth.route('/api/change-password', methods=['PUT'])
+@token_required
+def change_password(current_user, data):
+    user = User.query.filter_by(username=data['username']).first()
+    req = request.get_json()
+    old_password = req['current_password']
+    new_password = req['new_password']
+    confirm_password = req['confirm_password']
 
-@auth.route('/reset_password', methods=['POST'])
+    user = User.query.filter_by(username=data['username']).first()
+
+    if not user.check_password(old_password):
+        return jsonify({'error': 'Invalid password'}), 401
+    
+    if (new_password!=confirm_password):
+        # Verify passwords are matching
+        response = {'error':'The passwords should match!'}
+        return make_response(jsonify(response)), 302
+    try:
+        # Edit the password
+        user.set_password(new_password)
+        db.session.add(user)
+        db.session.commit()
+        response = {'message': 'Password changed successfully.'}
+    except Exception as e:
+        # Create a response containing an string error message
+        response = {'message': str(e)}
+        # Return a server error using the HTTP Error Code 500 (Internal Server Error)
+        return make_response(jsonify(response)), 500
+    return make_response(jsonify(response)), 200
+
+@auth.route('/api/reset_password', methods=['POST'])
 def reset_password():
     data = request.get_json()
     email = data.get('email')
@@ -117,7 +148,7 @@ def reset_password():
     
     return jsonify({'message': 'Password reset email sent'}), 200
 
-@auth.route('/reset_password/<token>', methods=['POST'])
+@auth.route('/api/reset_password/<token>', methods=['POST'])
 def reset_password_confirm(token):
     data = request.get_json()
     email = data.get('email')
