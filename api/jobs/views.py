@@ -221,7 +221,7 @@ def update_business(current_user, data, job_id):
         job_description = job_item['job']['job_description'],
         job_type = job_item['job']['job_type'],
         job_url = job_item['job']['job_url'],
-        application_state = job_item['job']['job_state']
+        application_state = job_item['job']['application_state']
         try:
             current_job.job_title = job_title
             current_job.job_company = job_company
