@@ -16,7 +16,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(500), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updateed_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
     google_id = db.Column(db.String(128))
     github_id = db.Column(db.String(128))
     linkedin_id = db.Column(db.String(64), nullable=True, unique=True)
