@@ -126,7 +126,7 @@ def change_password(current_user, data):
         return make_response(jsonify(response)), 500
     return make_response(jsonify(response)), 200
 
-@auth.route('/api/reset_password', methods=['POST'])
+@auth.route('/api/reset-password', methods=['POST'])
 def reset_password():
     data = request.get_json()
     email = data.get('email')
@@ -146,27 +146,37 @@ def reset_password():
     
     # mail.send(msg)
     
-    return jsonify({'message': 'Password reset email sent'}), 200
+    return jsonify({
+        'message': 'Password reset email sent',
+        'token': token
+        }), 200
 
-@auth.route('/api/reset_password/<token>', methods=['POST'])
+@auth.route('/api/reset-password/<token>', methods=['PUT'])
 def reset_password_confirm(token):
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
-    
-    if email is None or password is None:
-        return jsonify({'error': 'Missing fields'}), 400
+    confirm_password = data.get('confirm_password')
     
     user = User.query.filter_by(email=email).first()
-    
-    if user is None or not user.verify_password_reset_token(token):
-        return jsonify({'error': 'Invalid email address or token'}), 404
+
+    if user is None:
+        return jsonify({'error': 'Invalid email address'}), 404        
+
+    if (password!=confirm_password):
+        # Verify passwords are matching
+        response = {'error':'The passwords should match!'}
+        return make_response(jsonify(response)), 302
+
+    if not user.verify_password_reset_token(token):
+        return jsonify({'error': 'Invalid token'}), 404
     
     user.set_password(password)
-    
+
+    db.session.add(user)
     db.session.commit()
     
-    return jsonify({'message': 'Password reset successful'}), 200
+    return jsonify({'message': 'Password has been reseted successful'}), 200
 
 # @auth.route('/verify_email/<token>', methods=['GET'])
 # def verify_email(token):
