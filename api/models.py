@@ -1,3 +1,4 @@
+import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
@@ -10,14 +11,16 @@ from . import db
 
 class User(UserMixin, db.Model):
     __tablename__='users'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, default=str(uuid.uuid4()))
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(500), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updateed_at = db.Column(db.DateTime, default=datetime.utcnow)
     google_id = db.Column(db.String(128))
     github_id = db.Column(db.String(128))
     linkedin_id = db.Column(db.String(64), nullable=True, unique=True)
+    verified = db.Column(db.String(50))
 
     def __repr__(self):
         return str(self.username)
