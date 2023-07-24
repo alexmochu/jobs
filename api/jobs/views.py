@@ -146,7 +146,7 @@ def get_current_user_jobs(current_user, data, userName):
             'job_location': job.job_location,
             'job_description': job.job_description,
             'job_url': job.job_url,
-            'job_state': job.application_state,
+            'application_state': job.application_state,
             'job_type': job.job_type
             }
             jobs.append(job_data)
@@ -256,7 +256,6 @@ def update_business(current_user, data, job_id):
 def delete_business_by_id(current_user, data, job_id):
     """ Method to get job by ID """
     job = Job.query.filter_by(id=job_id).first()
-    print('job id', job_id)
     owner = job.job_owner
     if data['username'] == owner:
         job.delete()
