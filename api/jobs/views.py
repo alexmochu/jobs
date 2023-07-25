@@ -11,9 +11,7 @@ from langchain.agents.agent_toolkits import PlayWrightBrowserToolkit
 # )
 from langchain.agents import AgentType
 from langchain.chat_models import ChatOpenAI
-from playwright.async_api import async_playwright
 import re
-from playwright.sync_api import Page, expect
 from langchain.chat_models import ChatAnthropic
 
 os.environ["GOOGLE_CSE_ID"] = ""
@@ -308,30 +306,9 @@ def openai_jobs():
     # return agent.run("what is langchain")
     return agent.run("search results of job url links of 10 recent remote react jobs that accept worldwide applicants in 2023")
 
-async def create_async_playwright_browser(loop):
-    async with async_playwright() as playwright:
-        browser = await playwright.chromium.launch()
-        context = await browser.new_context()
-        page = await context.new_page()
-
-        # Perform browser actions here
-
-        await browser.close()
-
 @jobs.route('/api/job_summary', methods=['GET'])
 async def job_summary():
     loop = asyncio.get_running_loop()
-    # async_browser = await create_async_playwright_browser(loop)
-    # # async_browser = await create_async_playwright_browser(loop)
-    # browser_toolkit = PlayWrightBrowserToolkit(async_browser=async_browser, sync_browser=None)
-    # tools = browser_toolkit.get_tools()
-    # llm = ChatOpenAI(temperature=0) # Also works well with Anthropic models
-    # agent_chain = initialize_agent(tools, llm, agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
-    # response = agent_chain.arun(input="Browse to https://jobs.kejanigarage.com/ and summarize the text, please.")
-    # return make_response(jsonify({
-    #     'summary': response
-    # }))
-    async_browser = create_async_playwright_browser(loop)
     toolkit = PlayWrightBrowserToolkit(sync_browser=None, async_browser=None)
     tools = toolkit.get_tools()
     llm = ChatAnthropic(temperature=0)  # or any other LLM, e.g., ChatOpenAI(), OpenAI()

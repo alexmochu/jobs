@@ -189,7 +189,9 @@ def reset_password_confirm(token):
 #             return jsonify(message='Invalid token'), 400
 
 #         # Mark email as verified
-#         user.email_verified = True
+#         user.verified = True
+        
+#         db.session.add(user)
 #         db.session.commit()
 
 #         return jsonify(message='Email verified successfully'), 200
