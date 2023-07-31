@@ -98,11 +98,13 @@ def logout(current_user_data, user_id):
 @auth.route('/api/change-password', methods=['PUT'])
 @token_required
 def change_password(current_user, data):
+    passwords = request.get_json()
+    items = passwords['passwords']
     user = User.query.filter_by(username=data['username']).first()
     req = request.get_json()
-    old_password = req['current_password']
-    new_password = req['new_password']
-    confirm_password = req['confirm_password']
+    old_password = items['current_password']
+    new_password = items['new_password']
+    confirm_password = items['confirm_password']
 
     user = User.query.filter_by(username=data['username']).first()
 
