@@ -11,7 +11,7 @@ from . import db
 
 class User(UserMixin, db.Model):
     __tablename__='users'
-    id = db.Column(db.Integer, primary_key=True, default=str(uuid.uuid4()))
+    id = db.Column(db.String(500), primary_key=True, default=lambda: str(uuid.uuid4()))
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(500), index=True, unique=True)
     password_hash = db.Column(db.String(128))
@@ -36,7 +36,7 @@ class User(UserMixin, db.Model):
     
     def get_token(self, expires_in=6000000000000000000):
         return jwt.encode(
-            {'username': str(self.username), 'id': self.id, 'exp': time() + expires_in},
+            {'username': str(self.username), 'email': str(self.email), 'id': self.id, 'exp': time() + expires_in},
             current_app.config['SECRET_KEY'], algorithm='HS256')
         
     
@@ -52,7 +52,7 @@ class User(UserMixin, db.Model):
     
     def generate_password_reset_token(self, expires_in=600):
         return jwt.encode(
-            {'reset_password': self.id},
+            {'reset_password': self.id, 'username': self.username},
             current_app.config['SECRET_KEY'], algorithm='HS256')
         
 
@@ -65,6 +65,22 @@ class User(UserMixin, db.Model):
             return
         return User.query.get(id)
     
+    def generate_verify_email_token(self, expires_in=600):
+        return jwt.encode(
+            {'email': str(self.email)},
+            current_app.config['SECRET_KEY'], algorithm='HS256')
+        
+
+    @staticmethod
+    def verify_email_token(token):
+        try:
+            id = jwt.decode(token, current_app.config['SECRET_KEY'],
+                            algorithms=['HS256'])['email']
+        except:
+            return
+        user = User.query.get(id)
+        return str(user)
+    
 class Job(db.Model):
     """
     Create Job Item
@@ -72,7 +88,7 @@ class Job(db.Model):
 
     __tablename__ = 'jobs'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, default=str(uuid.uuid4()))
     job_title = db.Column(db.String(128))
     job_company = db.Column(db.String(128))
     job_location = db.Column(db.String(50))
