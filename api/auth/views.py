@@ -1,6 +1,8 @@
 import os
 from flask import jsonify, request, make_response
 from flask_login import login_user
+from flask import current_app
+import jwt
 
 from . import auth
 from .. import db
@@ -33,9 +35,13 @@ def register():
     # Send email verification email
     # msg = Message('Email Verification', recipients=[new_user.email])
     # msg.body = f'To verify your email, click on the following link: {request.host_url}auth/verify_email/{token}'
-    # mail.send(msg)
+    # mail.s end(msg)
     
-    return jsonify({'message': 'Registration successful'}), 201
+    return jsonify({
+        'message': 'Registration successful',
+        'email': email,
+        'username': username
+        }), 201
 
 @auth.route('/api/login', methods=['POST'])
 def login():
@@ -128,6 +134,11 @@ def change_password(current_user, data):
         return make_response(jsonify(response)), 500
     return make_response(jsonify(response)), 200
 
+def serialize_user(user):
+    if isinstance(user, User):
+        return user.username,
+    raise TypeError("Object of type User is not JSON serializable")
+
 @auth.route('/api/reset-password', methods=['POST'])
 def reset_password():
     data = request.get_json()
@@ -143,14 +154,12 @@ def reset_password():
     
     token = user.generate_password_reset_token()
     
-    # msg = Message('Reset Password', recipients=[user.email])
-    # msg.body = f'To reset your password, click on the following link: {request.host_url}reset_password/{token}'
-    
-    # mail.send(msg)
+    username = serialize_user(user)
     
     return jsonify({
         'message': 'Password reset email sent',
-        'token': token
+        'token': token,
+        'username': username
         }), 200
 
 @auth.route('/api/reset-password/<token>', methods=['PUT'])
@@ -180,25 +189,51 @@ def reset_password_confirm(token):
     
     return jsonify({'message': 'Password has been reseted successful'}), 200
 
-# @auth.route('/verify_email/<token>', methods=['GET'])
-# def verify_email(token):
-#     try:
-#         # Load email from token
-#         email = serializer.loads(token, salt='email-verification', max_age=3600)
-#         # Find user with email
-#         user = User.query.filter_by(email=email).first()
-#         if not user:
-#             return jsonify(message='Invalid token'), 400
+@auth.route('/api/create-verify-email', methods=['POST'])
+def create_verify_email():
+    data = request.get_json()
+    email = data.get('email')
+    
+    if email is None:
+        return jsonify({'error': 'Email is missing'}), 400
+    
+    user = User.query.filter_by(email=email).first()
+    
+    if user is None:
+        return jsonify({'error': 'Invalid email address'}), 404
+    
+    token = user.generate_verify_email_token()
+    
+    # msg = Message('Reset Password', recipients=[user.email])
+    # msg.body = f'To reset your password, click on the following link: {request.host_url}reset_password/{token}'
+    
+    # mail.send(msg)
+    
+    return jsonify({
+        'message': 'Verify email sent',
+        'token': token
+        }), 200
 
-#         # Mark email as verified
-#         user.verified = True
+@auth.route('/api/verify-email/<token>', methods=['POST'])
+def verify_email(token):
+    try:
+        # Load email from token
+        decoded_token = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
+        email = decoded_token['email']
+        # Find user with email
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify(message='Invalid token'), 400
+
+        # Mark email as verified
+        user.verified = True
         
-#         db.session.add(user)
-#         db.session.commit()
+        db.session.add(user)
+        db.session.commit()
 
-#         return jsonify(message='Email verified successfully'), 200
-#     except:
-#         return jsonify(message='Invalid token'), 400
+        return jsonify(message='Email verified successfully'), 200
+    except:
+        return jsonify(message='Invalid token'), 400
         
 @auth.route("/profile")
 @token_required
