@@ -258,7 +258,7 @@ def delete_business_by_id(current_user, data, job_id):
     """ Method to get job by ID """
     job = Job.query.filter_by(id=job_id).first()
     owner = job.job_owner
-    if data['username'] == owner:
+    if data['id'] == owner:
         job.delete()
         response = {
             "result": "Job {} deleted".format(job.id),
