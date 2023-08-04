@@ -16,7 +16,7 @@ def token_required(f):
 
         if blacklisted:
             response = {"message": "Logged out. Please login again!" }
-            return make_response(jsonify(response)), 401
+            return make_response(jsonify(response)), 201
 
         if 'header-access-token' in request.headers:
             token = request.headers['header-access-token']
