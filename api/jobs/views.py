@@ -213,7 +213,7 @@ def create_job(current_user, data):
 def update_business(current_user, data, job_id):
     current_job = Job.query.filter_by(id=job_id).first()
     owner = current_job.job_owner
-    if data['username'] == owner:
+    if data['id'] == owner:
     # Obtain the new name of the business from the request data
         job_item = request.get_json()
         job_title = job_item['job']['job_title']
