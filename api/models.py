@@ -88,7 +88,7 @@ class Job(db.Model):
 
     __tablename__ = 'jobs'
 
-    id = db.Column(db.Integer, primary_key=True, default=str(uuid.uuid4()))
+    id = db.Column(db.String(500), primary_key=True, default=lambda: str(uuid.uuid4()))
     job_title = db.Column(db.String(128))
     job_company = db.Column(db.String(128))
     job_location = db.Column(db.String(50))

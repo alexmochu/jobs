@@ -149,7 +149,10 @@ def get_current_user_jobs(current_user, data, id):
             jobs.append(job_data)
         if jobs:
             return jsonify({'jobs': jobs}), 200
-        return jsonify({"message": "You haven't created any jobs"}), 201
+        return jsonify({
+            "message": "You haven't created any jobs",
+            "jobs": []
+            }), 201
     except Exception:
         return make_response(jsonify({"error": "Server error"})), 500
 
@@ -178,7 +181,7 @@ def create_job(current_user, data):
     try:
         created_job = Job(
             job_title=job_title, 
-            job_owner = data['username'], 
+            job_owner = data['id'], 
             job_company=job_company, 
             job_location = job_location, 
             job_description = job_description,
@@ -196,6 +199,7 @@ def create_job(current_user, data):
                 'job_description': created_job.job_description,
                 'job_type': created_job.job_type,
                 'job_url': created_job.job_url,
+                'job_owner': created_job.job_owner,
                 'application_state': created_job.application_state
             }
             })
