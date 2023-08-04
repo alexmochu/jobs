@@ -126,15 +126,14 @@ from ..utilities import token_required
 #     else:
 #         return jsonify({'Warning': 'Cannot comprehend the given search parameter'})
 
-@jobs.route('/api/jobs/<userName>')
+@jobs.route('/api/jobs/<id>')
 @token_required
-def get_current_user_jobs(current_user, data, userName):
+def get_current_user_jobs(current_user, data, id):
     """GET jobs created by current_user."""
     try:
         # get all businesses created by the user currently logged in
-        all_jobs = Job.query.order_by(Job.id.desc()).filter_by(job_owner=userName)
+        all_jobs = Job.query.order_by(Job.id.desc()).filter_by(job_owner=id)
         jobs = []
-        print(all_jobs)
         for job in all_jobs:
             job_data = {
             'job_id': job.id,
@@ -150,7 +149,7 @@ def get_current_user_jobs(current_user, data, userName):
             jobs.append(job_data)
         if jobs:
             return jsonify({'jobs': jobs}), 200
-        return jsonify({"message": "You haven't created any jobs"}), 404
+        return jsonify({"message": "You haven't created any jobs"}), 201
     except Exception:
         return make_response(jsonify({"error": "Server error"})), 500
 

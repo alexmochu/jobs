@@ -93,7 +93,7 @@ class Job(db.Model):
     job_company = db.Column(db.String(128))
     job_location = db.Column(db.String(50))
     job_description = db.Column(db.String(500))
-    job_owner = db.Column(db.String, db.ForeignKey('users.username'))
+    job_owner = db.Column(db.String, db.ForeignKey('users.id'))
     job_url = db.Column(db.String(128))
     job_type = db.Column(db.String(50))
     application_state = db.Column(db.String(50))
