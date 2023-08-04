@@ -36,7 +36,7 @@ class User(UserMixin, db.Model):
     
     def get_token(self, expires_in=6000000000000000000):
         return jwt.encode(
-            {'username': str(self.username), 'email': str(self.email), 'id': self.id, 'exp': time() + expires_in},
+            {'username': str(self.username), 'email': str(self.email), 'id': self.id},
             current_app.config['SECRET_KEY'], algorithm='HS256')
         
     
