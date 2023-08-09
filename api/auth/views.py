@@ -41,7 +41,7 @@ def register():
         'message': 'Registration successful',
         'email': email,
         'username': username
-        }), 201
+        }), 200
 
 @auth.route('/api/login', methods=['POST'])
 def login():
