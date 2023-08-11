@@ -1,4 +1,5 @@
 import os
+import resend
 from flask import jsonify, request, make_response
 from flask_login import login_user
 from flask import current_app
@@ -8,6 +9,9 @@ from . import auth
 from .. import db
 from ..models import User, BlacklistToken
 from ..utilities import token_required
+
+resend.api_key = os.environ["RESEND_API_KEY"]
+host = os.environ["HOST"]
 
 @auth.route('/api/register', methods=['POST'])
 def register():
@@ -31,11 +35,6 @@ def register():
     
     db.session.add(user)
     db.session.commit()
-     
-    # Send email verification email
-    # msg = Message('Email Verification', recipients=[new_user.email])
-    # msg.body = f'To verify your email, click on the following link: {request.host_url}auth/verify_email/{token}'
-    # mail.s end(msg)
     
     return jsonify({
         'message': 'Registration successful',
@@ -200,14 +199,42 @@ def create_verify_email():
         return jsonify({'error': 'Invalid email address'}), 404
     
     token = user.generate_verify_email_token()
-    
-    # msg = Message('Reset Password', recipients=[user.email])
-    # msg.body = f'To reset your password, click on the following link: {request.host_url}reset_password/{token}'
-    
-    # mail.send(msg)
+
+    link = host + "verify-email/" + token
+    username = user.get_username()
+
+    email_template = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Welcome to KG Jobs platform, please verify your account to enjoy full features.</title>
+    </head>
+    <body>
+        <h2>
+            <strong>Welcome to KG Jobs</strong>
+        </h2>
+        <h1>Hi %s,</p>
+        <p>Welcome to KG Jobs, the platform that helps you streamline your job search, create a winning resume, cover letters and ace your Interviews with our tools.</p>
+        <p>Please verify your account by clicking on the confirmation link below.</p>
+        <p><a href="%s">Verify Email!</a></p>
+        <p>Happy Job Hunting</p>
+        <p>The KG Jobs Team</p>
+        <p>https://jobs.kejanigarage.com</p>
+    </body>
+    </html>
+    """ % (username, link)
+
+    params = {
+        "from": "Alex <support@kejanigarage.com>",
+        "to": [email],
+        "subject": "Welcome to KG Jobs",
+        "html": email_template
+    }
+
+    r = resend.Emails.send(params)
     
     return jsonify({
-        'message': 'Verify email sent',
+        'message': 'Verification email sent',
         'token': token
         }), 200
 
