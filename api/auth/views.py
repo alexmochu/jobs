@@ -151,6 +151,55 @@ def reset_password():
     token = user.generate_password_reset_token()
     
     username = serialize_user(user)
+
+    link = host + "verify-email/" + token
+
+    email_template = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>KG Jobs reset password.</title>
+        <style>
+        body, p, a {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Custom styles */
+        p {
+            font-size: 14px;
+            font-weight: normal;
+            line-height: 1.5;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+    </head>
+    <body>
+        <p>Hi %s,</p>
+        <p>Someone recently requested a password change for your KG Jobs account. If this was you, you can set a new password here:</p>
+        <p><a href="%s">Reset Password!</a></p>
+        <p>If you don&apos;t want to change your password or didn&apos;t request this, just ignore and delete this message.</p>
+        <p>To keep your account secure, please don&apos;t forward this email to anyone.</p>
+        <p>Best,</p>
+        <p>The KG Jobs Team</p>
+        <p>https://jobs.kejanigarage.com</p>
+    </body>
+    </html>
+    """ % (username, link)
+
+    params = {
+        "from": "Alex <support@kejanigarage.com>",
+        "to": [email],
+        "subject": "KG Jobs reset password",
+        "html": email_template
+    }
+
+    r = resend.Emails.send(params)
     
     return jsonify({
         'message': 'Password reset email sent',
