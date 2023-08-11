@@ -152,7 +152,7 @@ def reset_password():
     
     username = serialize_user(user)
 
-    link = host + "verify-email/" + token
+    link = host + "forgot-password/" + token
 
     email_template = """
     <!DOCTYPE html>
