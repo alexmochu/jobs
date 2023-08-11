@@ -208,12 +208,28 @@ def create_verify_email():
     <html>
     <head>
         <title>Welcome to KG Jobs platform, please verify your account to enjoy full features.</title>
+        <style>
+        body, p, a {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Custom styles */
+        p {
+            font-size: 14px;
+            font-weight: normal;
+            line-height: 1.5;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
     </head>
     <body>
-        <h2>
-            <strong>Welcome to KG Jobs</strong>
-        </h2>
-        <h1>Hi %s,</p>
+        <p>Hi %s,</p>
         <p>Welcome to KG Jobs, the platform that helps you streamline your job search, create a winning resume, cover letters and ace your Interviews with our tools.</p>
         <p>Please verify your account by clicking on the confirmation link below.</p>
         <p><a href="%s">Verify Email!</a></p>
