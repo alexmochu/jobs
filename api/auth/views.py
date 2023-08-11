@@ -153,6 +153,7 @@ def reset_password():
     username = serialize_user(user)
 
     link = host + "forgot-password/" + token
+    u_name = user.get_username()
 
     email_template = """
     <!DOCTYPE html>
@@ -190,7 +191,7 @@ def reset_password():
         <p>https://jobs.kejanigarage.com</p>
     </body>
     </html>
-    """ % (username, link)
+    """ % (u_name, link)
 
     params = {
         "from": "Alex <support@kejanigarage.com>",
