@@ -194,7 +194,7 @@ def reset_password():
     """ % (u_name, link)
 
     params = {
-        "from": "Alex <support@kejanigarage.com>",
+        "from": "KG Jobs <support@kejanigarage.com>",
         "to": [email],
         "subject": "KG Jobs reset password",
         "html": email_template
@@ -291,7 +291,7 @@ def create_verify_email():
     """ % (username, link)
 
     params = {
-        "from": "Alex <support@kejanigarage.com>",
+        "from": "KG Jobs <support@kejanigarage.com>",
         "to": [email],
         "subject": "Welcome to KG Jobs",
         "html": email_template
