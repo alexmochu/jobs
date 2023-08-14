@@ -2,11 +2,13 @@
 
 # universal imports
 from flask import Flask, jsonify, request, make_response
-from apiclient.discovery import build
+# from apiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
+from ..utilities import token_required
 
 # local imports
 from . import admin
+from ..models import User, Job
 
 # Tutoral -> https://alexmarginean.medium.com/how-to-get-website-metrics-from-google-analytics-with-flask-python-cb9a4a7e8e33
 
@@ -53,16 +55,16 @@ def get_visitors(response):
   return str(visitors)
 
 # admin route
-@admin.route('/admin')
-def admin():
-    analytics = initialize_analyticsreporting()
-    res = get_report(analytics)
-    visitors = get_visitors(res)
+# @admin.route('/admin')
+# def admin():
+#     analytics = initialize_analyticsreporting()
+#     res = get_report(analytics)
+#     visitors = get_visitors(res)
     
-    response = jsonify({
-        "message": "Welcome to Kejani's Garage Admin",
-        "visitors": str(visitors)})
-    return response
+#     response = jsonify({
+#         "message": "Welcome to Kejani's Garage Admin",
+#         "visitors": str(visitors)})
+#     return response
 
 # @admin.route('/visitors')
 # def visitors():
@@ -72,3 +74,58 @@ def admin():
   
 #   response = jsonify({"message": str(visitors)})
 #   return response
+
+@admin.route('/admin/users', methods=['GET'])
+@token_required
+def get_all_user(current_user, data):
+    try:
+        # get all businesses created by the user currently logged in
+        all_users = User.query.order_by(User.id.desc())
+        users = []
+        for user in all_users:
+            user_data = {
+            'user_id': user.id,
+            'user_username': user.username, 
+            'user_email' : user.email,
+            'user_role': user.role,
+            'user_created': user.created_at,
+            'user_verified': user.verified
+            }
+            users.append(user_data)
+        if users:
+            return jsonify({'users': users}), 200
+        return jsonify({
+            "message": "You dont have any users",
+            "jobs": []
+            }), 201
+    except Exception:
+        return make_response(jsonify({"error": "Server error"})), 500
+
+@admin.route('/admin/jobs', methods=['GET'])
+@token_required
+def get_all_jobs(current_user, data):
+    try:
+        # get all businesses created by the user currently logged in
+        all_jobs = Job.query.order_by(Job.id.desc())
+        jobs = []
+        for job in all_jobs:
+            job_data = {
+            'job_id': job.id,
+            'job_title': job.job_title, 
+            'job_owner' : job.job_owner,
+            'job_company': job.job_company,
+            'job_location': job.job_location,
+            'job_description': job.job_description,
+            'job_url': job.job_url,
+            'application_state': job.application_state,
+            'job_type': job.job_type
+            }
+            jobs.append(job_data)
+        if jobs:
+            return jsonify({'jobs': jobs}), 200
+        return jsonify({
+            "message": "No jobs have been created",
+            "jobs": []
+            }), 201
+    except Exception:
+        return make_response(jsonify({"error": "Server error"})), 500
