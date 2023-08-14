@@ -96,7 +96,7 @@ def get_all_user(current_user, data):
             return jsonify({'users': users}), 200
         return jsonify({
             "message": "You dont have any users",
-            "jobs": []
+            "users": []
             }), 201
     except Exception:
         return make_response(jsonify({"error": "Server error"})), 500
