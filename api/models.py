@@ -95,7 +95,7 @@ class Job(db.Model):
     job_location = db.Column(db.String(50))
     job_description = db.Column(db.String(500))
     job_owner = db.Column(db.String, db.ForeignKey('users.id'))
-    job_url = db.Column(db.String())
+    job_url = db.Column(db.String(1000))
     job_type = db.Column(db.String(50))
     application_state = db.Column(db.String(50))
     #business_category_id = db.Column(db.Integer, db.ForeignKey('categories.id', ondelete='CASCADE', onupdate='CASCADE'))
