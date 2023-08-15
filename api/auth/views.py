@@ -23,12 +23,12 @@ def register():
     
     if username is None or email is None or password is None:
         return jsonify({'error': 'Missing fields'}), 400
+
+    if User.query.filter_by(email=email).first() is not None:
+        return jsonify({'error': 'Email already exists'}), 400
     
     if User.query.filter_by(username=username).first() is not None:
         return jsonify({'error': 'Username already exists'}), 400
-    
-    if User.query.filter_by(email=email).first() is not None:
-        return jsonify({'error': 'Email already exists'}), 400
     
     user = User(username=username, email=email)
     user.set_password(password)
