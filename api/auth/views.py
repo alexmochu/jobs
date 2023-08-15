@@ -210,23 +210,21 @@ def reset_password():
 
 @auth.route('/api/reset-password/<token>', methods=['PUT'])
 def reset_password_confirm(token):
-    data = request.get_json()
-    email = data.get('email')
+    info = request.get_json()
+    data = info.get('info')
+    id = data.get('id')
     password = data.get('password')
     confirm_password = data.get('confirm_password')
     
-    user = User.query.filter_by(email=email).first()
+    user = User.query.filter_by(id=id).first()
 
-    if user is None:
-        return jsonify({'error': 'Invalid email address'}), 404        
+    if not user.verify_password_reset_token(token):
+        return jsonify({'error': 'Invalid token'}), 404       
 
     if (password!=confirm_password):
         # Verify passwords are matching
         response = {'error':'The passwords should match!'}
         return make_response(jsonify(response)), 302
-
-    if not user.verify_password_reset_token(token):
-        return jsonify({'error': 'Invalid token'}), 404
     
     user.set_password(password)
 
