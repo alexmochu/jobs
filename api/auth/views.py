@@ -2,6 +2,7 @@ import os
 import resend
 from flask import jsonify, request, make_response
 from flask_login import login_user
+from datetime import datetime
 from flask import current_app
 import jwt
 
@@ -90,6 +91,10 @@ def logout(current_user_data, user_id):
         # insert the token
         blacklist_token = BlacklistToken(token=header_access_token)
         blacklist_token.save()
+
+        user.last_login = datetime.datetime.utcnow()
+        user.save()
+        
         response = {
             'message': 'Successfully logged out.'
         }
