@@ -22,9 +22,18 @@ class User(UserMixin, db.Model):
     github_id = db.Column(db.String(128))
     linkedin_id = db.Column(db.String(64), nullable=True, unique=True)
     verified = db.Column(db.String(50))
+    last_login = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
         return str(self.username)
+    
+
+    def save(self):
+        """
+        Save a job to the database
+        """
+        db.session.add(self)
+        db.session.commit()
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -37,7 +46,7 @@ class User(UserMixin, db.Model):
     
     def get_token(self, expires_in=6000000000000000000):
         return jwt.encode(
-            {'username': str(self.username), 'email': str(self.email), 'id': self.id, 'role': str(self.role)},
+            {'username': str(self.username), 'logout': str(datetime.utcnow()) , 'email': str(self.email), 'id': self.id, 'role': str(self.role)},
             current_app.config['SECRET_KEY'], algorithm='HS256')
         
     
