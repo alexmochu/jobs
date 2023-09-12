@@ -130,6 +130,40 @@ class Job(db.Model):
         """
         return "<Job: {}>".format(self.job_title)
     
+class Letter(db.Model):
+    """
+    Create Cover Letter Item
+    """
+
+    __tablename__ = 'letters'
+
+    id = db.Column(db.String(500), primary_key=True, default=lambda: str(uuid.uuid4()))
+    cover_title = db.Column(db.String(128))
+    cover_letter = db.Column(db.Text())
+    cover_owner = db.Column(db.String, db.ForeignKey('users.id'))
+    #business_category_id = db.Column(db.Integer, db.ForeignKey('categories.id', ondelete='CASCADE', onupdate='CASCADE'))
+
+    def save(self):
+        """
+        Save a letter to the database
+        """
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        """
+        Deletes a given letter
+        """
+        db.session.delete(self)
+        db.session.commit()
+
+
+    def __repr__(self):
+        """
+        Return a representation of a letter instance
+        """
+        return "<Cover letter: {}>".format(self.cover_title)
+    
 class BlacklistToken(db.Model):
     """
     Token Model for storing blacklisted JWT tokens
