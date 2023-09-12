@@ -92,7 +92,7 @@ def logout(current_user_data, user_id):
         blacklist_token = BlacklistToken(token=header_access_token)
         blacklist_token.save()
 
-        user.last_login = datetime.datetime.utcnow()
+        user.last_login = datetime.utcnow()
         user.save()
         
         response = {
