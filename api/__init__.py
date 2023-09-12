@@ -54,6 +54,9 @@ def create_app(config_name):
 
     from .jobs import jobs as jobs_blueprint
     app.register_blueprint(jobs_blueprint)
+
+    from .letters import letters as letters_blueprint
+    app.register_blueprint(letters_blueprint)
     
     from .gpt import gpt as gpt_blueprint
     app.register_blueprint(gpt_blueprint)
