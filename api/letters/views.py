@@ -17,7 +17,7 @@ def get_current_user_letters(current_user, data, id):
     """GET letters created by current_user."""
     try:
         # get all businesses created by the user currently logged in
-        all_letters = Letter.query.order_by(Letter.id.desc()).filter_by(id=id)
+        all_letters = Letter.query.order_by(Letter.id.desc()).filter_by(cover_owner=id)
         letters = []
         for letter in all_letters:
             letter_data = {
