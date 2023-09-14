@@ -1,4 +1,5 @@
 import uuid
+from sqlalchemy.dialects.postgresql import JSONB
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
@@ -163,6 +164,41 @@ class Letter(db.Model):
         Return a representation of a letter instance
         """
         return "<Cover letter: {}>".format(self.cover_title)
+    
+class Resume(db.Model):
+    """
+    Create Resume Item
+    """
+
+    __tablename__ = 'resumes'
+
+    id = db.Column(db.String(500), primary_key=True, default=lambda: str(uuid.uuid4()))
+    resume_title = db.Column(db.String(128))
+    resume_template = db.Column(db.Integer)
+    resume_details = db.Column(JSONB)
+    resume_owner = db.Column(db.String, db.ForeignKey('users.id'))
+    #business_category_id = db.Column(db.Integer, db.ForeignKey('categories.id', ondelete='CASCADE', onupdate='CASCADE'))
+
+    def save(self):
+        """
+        Save a resume to the database
+        """
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        """
+        Deletes a given resume
+        """
+        db.session.delete(self)
+        db.session.commit()
+
+
+    def __repr__(self):
+        """
+        Return a representation of a resume instance
+        """
+        return "<Resume: {}>".format(self.resume_title)
     
 class BlacklistToken(db.Model):
     """
