@@ -57,7 +57,10 @@ def create_app(config_name):
 
     from .letters import letters as letters_blueprint
     app.register_blueprint(letters_blueprint)
-    
+
+    from .resumes import resumes as resumes_blueprint
+    app.register_blueprint(resumes_blueprint)
+
     from .gpt import gpt as gpt_blueprint
     app.register_blueprint(gpt_blueprint)
     
