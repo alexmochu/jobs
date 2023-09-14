@@ -71,8 +71,8 @@ def update_letters(current_user, data, letter_id):
     if data['id'] == owner:
     # Obtain the new name of the business from the request data
         letter = request.get_json()
-        letter_title: letter['letter']['cover_title']
-        letter_cover: letter['letter']['cover_letter']
+        letter_title = letter['letter']['letter_title']
+        letter_cover = letter['letter']['letter_description']
         try:
             current_letter.cover_title = letter_title
             current_letter.cover_letter = letter_cover
