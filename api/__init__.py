@@ -22,7 +22,6 @@ from .models import login_manager
 
 def create_app(config_name):
     app = Flask(__name__, instance_relative_config=True)
-    mail = Mail(app)
     # Reverse the following 2 lines in production
     # app.config.from_object(app_config[config_name])
     app.config.from_object(app_config[config_name])
@@ -32,11 +31,15 @@ def create_app(config_name):
     db.init_app(app)
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-    app.config['MAIL_PORT'] = 465
-    app.config['MAIL_USE_SSL'] = True
-    app.config['MAIL_USERNAME'] = os.getenv('MAIL_DEFAULT_SENDER')
-    app.config['MAIL_PASSWORD'] = 'your-email-password'
+    app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # Update with your SMTP server
+    app.config['MAIL_PORT'] = 587  # Update with your SMTP port
+    app.config['MAIL_USERNAME'] = os.getenv('MAIL') # Your email
+    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')  # Your email password
+    app.config['MAIL_USE_TLS'] = True
+    app.config['MAIL_USE_SSL'] = False
+
+    mail = Mail(app)
+
     migrate = Migrate(app, db)
     
     login_manager.init_app(app)
